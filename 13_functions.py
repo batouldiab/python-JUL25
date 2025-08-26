@@ -84,3 +84,29 @@ r = myFunc(5) # r will get the value of res
 print(r)
 r2 = myFunc(7)
 print(r2)
+
+
+# recursion:
+def myFunc(n):
+    if n > 0:
+        print(n)
+        myFunc(n-1)
+    else:
+        print("done")
+
+myFunc(5)
+# the function will call itself until n=0
+# the function will print 5,4,3,2,1,0
+# then print "done"
+
+# example 2:
+def factorial(n):
+    if n == 1:
+        return 1
+    else:
+        return n * factorial(n-1)
+
+
+# for empty function
+def test():
+    pass
