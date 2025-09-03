@@ -111,7 +111,13 @@ def save_student_data(student_data, file_path):
     write the code that gets the student data dictionary as the row to append to file.
     don't forget to handle the case if file_path doesn't exist.
     """
-    pass
+    df = pd.DataFrame(student_data)
+    file_exists = os.path.isfile(file_path)
+
+    if not file_exists:
+        df.to_csv(file_path, index=False)
+    else:
+        df.to_csv(file_path, index=False, header=False, mode = 'a')
 
 
 
@@ -122,7 +128,22 @@ def modify_student_data(student_name, new_grades, file_path):
     write the code to get the dataframe from the file.
     if the student's data are in the file, modify the grades with the new grades. 
     """
-    pass
+    file_exists = os.path.isfile(file_path)
+    if not file_exists:
+        print("No database exists!")
+    else:
+        df = pd.read_csv(file_path)
+        new_avg = calculate_average(new_grades)
+        new_letter = assign_letter_grade(new_avg)
+
+        if student_name in df['Name'].values:
+            df.loc[df['Name']==student_name, 'Grades'] = str(new_grades)
+            df.loc[df['Name']==student_name, 'Average'] = new_avg
+            df.loc[df['Name']==student_name, 'Letter Grade'] = new_letter
+
+            df.to_csv(file_path, index=False)
+        else:
+            print(f"No student was found with the name {student_name}")
 
 
 
@@ -153,19 +174,38 @@ def main():
     If user enters 4, it will print "Exiting..." and stops the prgram.
     any other choice will cause printing "Invalid option, please try again."
     """
-    file_path = 'students_grades.csv'
-    while(True):
-        print("\n1. Add a new student\n2. Modify a student's grades\n3. List all students\n4. Exit")
+    path = 'students_grades.csv'
+    while True:
+        print("-----------\n1. Add a new student\n2. Modify a student's grades\n3. List all students\n4. Exit")
         choice = input("Choose an option: ")
-
         if choice == "1":
-            # more code here
-            print(f"Student {student_name} added successfully!")
+            student_name = input("Enter the student's name: ")
+            grades = get_grades()
+            avg = calculate_average(grades)
+            letter = assign_letter_grade(avg)
+
+            student = {
+                'Name': [student_name],
+                'Grades': [grades],
+                'Average': [avg],
+                'Letter Grade': [letter]
+            }
+            try:
+                save_student_data(student, path)
+                print(f'Student {student_name} added successfully!')
+            except:
+                print("An error occured saving the student")
+
         elif choice == "2":
-            # more code here
-            print(f"Student {student_name}'s grades have been updated.")
+            try:
+                student_name = input("Enter the student name (for the student you want to modify his/her grades): ")
+                grades = get_grades()
+                modify_student_data(student_name, grades, path)
+                print(f"Student {student_name} grades modified successfully!")
+            except:
+                print("Failed to modify!")
         elif choice == "3":
-            list_students(file_path)
+            list_students(path)
         elif choice == "4":
             print("Exiting...")
             break
